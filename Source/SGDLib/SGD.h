@@ -414,7 +414,8 @@ protected:
                                          std::list<Matrix<ElemType>>& smoothedGradients, std::vector<double> smoothedCounts,
                                          /*out*/ EpochCriterion& epochCriterion,
                                          /*out*/ std::vector<EpochCriterion>& epochEvalErrors,
-                                         std::string prefixMsg = "");
+                                         std::string prefixMsg,
+                                         const size_t maxNumOfSamples);
 
     size_t AdaptiveMinibatchSizing(ComputationNetworkPtr net,
                                    ComputationNetworkPtr refNet,
@@ -478,7 +479,8 @@ protected:
                          std::list<Matrix<ElemType>>& smoothedGradients, std::vector<double>& smoothedCounts,
                          /*out*/ EpochCriterion& epochCriterion,
                          /*out*/ std::vector<EpochCriterion>& epochEvalErrors,
-                         const std::string& prefixMsg = "");
+                         const std::string& prefixMsg = "",
+                         const size_t maxNumberOfSamples = std::numeric_limits<size_t>().max());
 
     void InitDistGradAgg(int numEvalNodes, int numGradientBits, int traceLevel);
     void InitModelAggregationHandler(int traceLevel, DEVICEID_TYPE devID);
