@@ -1074,7 +1074,7 @@ size_t SGD<ElemType>::TrainOneEpoch(ComputationNetworkPtr net,
 
         if (shouldCheckEarlyExit)
         {
-            if (maxNumberOfSamples < trainSetDataReader->GetCurrentSamplePosition() - epochStartSample)
+            if (epochStartSample + maxNumberOfSamples < trainSetDataReader->GetCurrentSamplePosition())
                 trainingFinished = true;
         }
 
