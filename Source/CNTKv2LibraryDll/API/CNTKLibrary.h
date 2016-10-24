@@ -3473,7 +3473,7 @@ namespace CNTK
         deserializerConfiguration[L"input"] = inputStreamsConfig;
         minibatchSourceConfiguration[L"deserializers"] = std::vector<::CNTK::DictionaryValue>({ deserializerConfiguration });
 
-        return CreateCompositeMinibatchSource(minibatchSourceConfiguration);
+        return CreateCompositeMinibatchSource(minibatchSourceConfiguration, communicator);
     }
 
     ///
