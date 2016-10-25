@@ -974,7 +974,7 @@ size_t SGD<ElemType>::TrainOneEpoch(ComputationNetworkPtr net,
         bool wasDataRead = DataReaderHelpers::GetMinibatchIntoNetwork<ElemType>(*trainSetDataReader, net, criterionNodes[0],
                                                                                 useDistributedMBReading, useParallelTrain, *inputMatrices, actualMBSize, m_mpi);
 
-        if (maxNumSamplesExceeded) // Stop reading.
+        if (maxNumSamplesExceeded) // Dropping data.
             wasDataRead = false;
 
         if (!wasDataRead && (!useDistributedMBReading || noMoreSamplesToProcess)) // in case of distributed reading, we do a few more loops until all ranks have completed
