@@ -945,9 +945,9 @@ size_t SGD<ElemType>::TrainOneEpoch(ComputationNetworkPtr net,
     }
 
     // In case adaptive minibatch/learning rates are used, the training can be limited by the maxNumberOfSamples.
-    bool trainingFinished = false;
+    bool maxNumSamplesExceeded = false;
     size_t epochStartSample = 0;
-    bool shouldCheckEarlyExit = maxNumberOfSamples != SIZE_MAX;
+    bool shouldCheckEarlyExit = (maxNumberOfSamples != SIZE_MAX);
     if (shouldCheckEarlyExit)
     {
         // SparsePC, LibSCV and DSS readers do not implement GetCurrentSamplePosition()
@@ -973,8 +973,11 @@ size_t SGD<ElemType>::TrainOneEpoch(ComputationNetworkPtr net,
         size_t actualMBSize = 0;
         bool wasDataRead = DataReaderHelpers::GetMinibatchIntoNetwork<ElemType>(*trainSetDataReader, net, criterionNodes[0],
                                                                                 useDistributedMBReading, useParallelTrain, *inputMatrices, actualMBSize, m_mpi);
-        if (trainingFinished ||
-            !wasDataRead && (!useDistributedMBReading || noMoreSamplesToProcess)) // in case of distributed reading, we do a few more loops until all ranks have completed
+
+        if (maxNumSamplesExceeded) // Stop reading.
+            wasDataRead = false;
+
+        if (!wasDataRead && (!useDistributedMBReading || noMoreSamplesToProcess)) // in case of distributed reading, we do a few more loops until all ranks have completed
             break;                                                                // end of epoch
 
         if (m_perfTraceLevel > 0)
@@ -1072,10 +1075,12 @@ size_t SGD<ElemType>::TrainOneEpoch(ComputationNetworkPtr net,
         } // if (actualMBSize > 0)
         // WARNING: If actualMBSize == 0, then criterion nodes have NOT been updated, and contain garbage (last MB's) values.
 
+        // In case of mini epochs (used for adaptive minibatch size and learning rate),
+        // no more data should be processed by this worker.
         if (shouldCheckEarlyExit)
         {
             if (epochStartSample + maxNumberOfSamples < trainSetDataReader->GetCurrentSamplePosition())
-                trainingFinished = true;
+                maxNumSamplesExceeded = true;
         }
 
         if (m_perfTraceLevel > 0)
